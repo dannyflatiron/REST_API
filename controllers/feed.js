@@ -1,6 +1,14 @@
 exports.getPosts = (request, response, next) => {
   response.status(200).json({
-    posts: [{ title: 'First Post', content: 'Hello World!' }]
+    posts: [{ 
+      title: 'First Post', 
+      content: 'Hello World!', 
+      imageUrl: 'images/skyline.jpg',
+      creator: {
+        name: 'Danny'
+      },
+      createAt: new Date()
+    }]
   })
 }
 
