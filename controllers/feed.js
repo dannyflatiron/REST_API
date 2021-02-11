@@ -17,6 +17,14 @@ exports.createPost = (request, response, next) => {
   const content = request.body.content
   response.status(201).json({
     message: 'Post created!',
-    post: {id: new Date().toISOString(), title: title, content: content}
+    post: { 
+      _id: new Date().toISOString(), 
+      title: title, 
+      content: content,
+      creator: {
+        name: 'Danny'
+      },
+      createAt: new Date()
+    }
   })
 }
