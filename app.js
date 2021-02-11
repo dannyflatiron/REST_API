@@ -1,5 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+require('dotenv').config()
+const mongoose = require('mongoose')
 
 const feedRoutes = require('./routes/feed')
 
@@ -17,4 +19,11 @@ app.use((request, response, next) => {
 
 app.use('/feed', feedRoutes)
 
-app.listen(8080)
+mongoose.connect(
+  `mongodb+srv://dannyreina:${process.env.PASSWORD}@cluster0.vnxsz.mongodb.net/network?retryWrites=true&w=majority`,
+  { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(result => 
+  {
+    app.listen(8080)
+  })
+  .catch(err => console.log(err))
