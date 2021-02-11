@@ -5,9 +5,22 @@ const path = require('path')
 
 
 exports.getPosts = (request, response, next) => {
+  const currentPage = request.query.page || 1
+  const perPage = 2
+  let totalItems
   Post.find()
+  .countDocuments()
+  .then(count => {
+    totalItems = count
+    return Post.find()
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage)
+  })
   .then(posts => {
-    response.status(200).json({ message: 'Fetched psots successfully', posts: posts})
+    response.status(200).json({ 
+      message: 'Fetched psots successfully', 
+      posts: posts, 
+      totalItems: totalItems})
   })
   .catch(error => {
     if (error.statusCode) {
