@@ -5,33 +5,30 @@ const fs = require('fs')
 const path = require('path')
 
 
-exports.getPosts = (request, response, next) => {
+exports.getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1
   const perPage = 2
-  let totalItems
-  Post.find()
-  .countDocuments()
-  .then(count => {
-    totalItems = count
-    return Post.find()
+  try {
+  const totalItems = await Post.find().countDocuments()
+  const posts = await Post.find()
+    .populate('creator')
     .skip((currentPage - 1) * perPage)
     .limit(perPage)
-  })
-  .then(posts => {
+  
     response.status(200).json({ 
       message: 'Fetched psots successfully', 
       posts: posts, 
-      totalItems: totalItems})
-  })
-  .catch(error => {
+      totalItems: totalItems
+    })
+  } catch (error) {
     if (error.statusCode) {
       error.statusCode = 500
     }
     next(error)
-  })
+  }
 }
 
-exports.createPost = (req, res, next) => {
+exports.createPost = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.');
@@ -53,49 +50,43 @@ exports.createPost = (req, res, next) => {
     imageUrl: imageUrl,
     creator: req.userId
   });
-  post
-    .save()
-    .then(result => {
-      return User.findById(req.userId);
-    })
-    .then(user => {
-      creator = user;
+  try {
+    await post.save()
+    const user = await User.findById(req.userId);
       user.posts.push(post);
-      return user.save();
-    })
-    .then(result => {
+    await user.save();
       res.status(201).json({
         message: 'Post created successfully!',
         post: post,
-        creator: { _id: creator._id, name: creator.name }
+        creator: { _id: user._id, name: user.name }
       });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+  } catch (error) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
-exports.getPost = (request, response, next) => {
+exports.getPost = async (request, response, next) => {
   const postId = request.params.postId
-  Post.findById(postId)
-    .then(post => {
-      if (!post) {
-        const error = new Error('Could not find post.')
-        error.statusCode = 404
-        throw error
-      }
-      response.status(200).json({ message: 'Post fetched', post: post })
-    })
-    .catch(error => {
-      if (!error.statusCode) {
-        error.statusCode = 500
-      }
-      next(error)
-    })
+  const post = await Post.findById(postId)
+  try {
+    if (!post) {
+      const error = new Error('Could not find post.')
+      error.statusCode = 404
+      throw error
+    }
+    response.status(200).json({ message: 'Post fetched', post: post })
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500
+    }
+    next(error)
+  }
 }
+
+// ###### FINISH APPLYING ASYCN AWAIT TO REMAINING FUNCTIONS HERE & IN AUTH.JS
 
 exports.updatePost = (request, response, next) => {
   const errors = validationResult(request);
