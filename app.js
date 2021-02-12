@@ -60,8 +60,11 @@ app.use((error, request, response, next) => {
 mongoose.connect(
   `mongodb+srv://dannyreina:${process.env.PASSWORD}@cluster0.vnxsz.mongodb.net/network?retryWrites=true&w=majority`,
   { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(result => 
-  {
-    app.listen(8080)
+  .then(result => {
+    const server = app.listen(8080);
+    const io = require('./socket').init(server);
+    io.on('connection', socket => {
+      console.log('Client connected');
+    });
   })
   .catch(err => console.log(err))
