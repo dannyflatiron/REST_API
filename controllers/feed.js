@@ -13,6 +13,7 @@ exports.getPosts = async (request, response, next) => {
   const totalItems = await Post.find().countDocuments()
   const posts = await Post.find()
     .populate('creator')
+    .sort({createdAt: -1})
     .skip((currentPage - 1) * perPage)
     .limit(perPage)
   
@@ -143,42 +144,36 @@ exports.updatePost = async (request, response, next) => {
   }
 }
 
-exports.deletePost = (request, response, next) => {
-  const postId = request.params.postId
-  Post.findById(postId)
-  .then(post => {
+exports.deletePost = async (req, res, next) => {
+  const postId = req.params.postId
+  try {
+    const post = await Post.findById(postId)
+
     if (!post) {
       const error = new Error('Could not find post.')
       error.statusCode = 404
       throw error
     }
-    if (post.creator.toString() !== request.userId) {
-      const error = new Error('Not authorized.')
+    if (post.creator.toString() !== req.userId) {
+      const error = new Error('Not authorized!')
       error.statusCode = 403
       throw error
     }
     clearImage(post.imageUrl)
-    return Post.findByIdAndRemove(postId)
-  })
-  .then(result => {
-    return User.findById(request.userId)
-  })
-  .then(user => {
-    user.posts.pull(postId)
-    return user.save()
-  })
-  .then(result => {
-    console.log(result)
-    response.status(200).json({ message: 'Deleted post.' })
-  })
-  .catch(error => {
-    if (!error.statusCode) {
-      error.statusCode = 500
-    }
-    next(error)
-  })
-}
+    await Post.findByIdAndRemove(postId)
 
+    const user = await User.findById(req.userId)
+    user.posts.pull(postId)
+    await user.save()
+    io.getIO().emit('posts', { action: 'delete', post: postId })
+    res.status(200).json({ message: 'Deleted post.' })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
 const clearImage = filePath => {
   filePath = path.join(__dirname, '..', filePath)
   fs.unlink(filePath, error => console.log(error))
