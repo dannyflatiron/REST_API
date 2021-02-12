@@ -91,7 +91,7 @@ exports.getPost = async (request, response, next) => {
 
 // ###### FINISH APPLYING ASYCN AWAIT TO REMAINING FUNCTIONS HERE & IN AUTH.JS
 
-exports.updatePost = (request, response, next) => {
+exports.updatePost = async (request, response, next) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.');
@@ -113,14 +113,14 @@ exports.updatePost = (request, response, next) => {
     error.statusCode = 422
     throw error
   }
-  Post.findById(postId)
-  .then(post => {
+  try {
+    const post = await Post.findById(postId).populate('creator')
     if (!post) {
       const error = new Error('Could not find post.')
       error.statusCode = 404
       throw error
     }
-    if (post.creator.toString() !== request.userId) {
+    if (post.creator._id.toString() !== request.userId) {
       const error = new Error('Not authorized.')
       error.statusCode = 403
       throw error
@@ -132,17 +132,15 @@ exports.updatePost = (request, response, next) => {
     post.imageUrl = imageUrl
     post.content = content
     // console.log('editted post', post)
-    return post.save()
-  })
-  .then(result => {
+    const result = await post.save()
+    io.getIO().emit('posts', { action: 'update', post: result })
     response.status(200).json({ message: 'Post updated!', post: result })
-  })
-  .catch(error => {
+  } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500
     }
     next(error)
-  })
+  }
 }
 
 exports.deletePost = (request, response, next) => {
