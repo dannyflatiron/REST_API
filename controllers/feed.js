@@ -74,7 +74,7 @@ exports.createPost = async (req, res, next) => {
 };
 exports.getPost = async (request, response, next) => {
   const postId = request.params.postId
-  const post = await Post.findById(postId)
+  const post = await Post.findById(postId).populate('creator')
   try {
     if (!post) {
       const error = new Error('Could not find post.')
