@@ -3,6 +3,12 @@
 
 This app was built with the intention of showcasing websocket functionality. App features a react client side supported by a node.js RESTful API backend with data stored on a MongoDB cluster. Features include user signup and login. Validation and authentication error handling. Websocket functionality provided by socket.io.
 
+[Signup Login Feature Demo](https://youtu.be/CcWYHxC6Ycc).
+
+[Websocket Functionality Feature Demo](https://youtu.be/JBWBfJBn2I0).
+
+[Creating Posts Feature](https://youtu.be/uYNxAMbH0_I).
+
 ***Upcoming Features***
 -convert codebase to typescript to enhance development stage
 
