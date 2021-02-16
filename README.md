@@ -1,7 +1,7 @@
 # MESSAGE_BOARD_API
 ### A message board app with websocket functionality
 
-This app was built with the intention of showcasing websocket functionality. App features a react client side supported by a node.js RESTful API backend with data stored on a MongoDB cluster. Features include user signup and login. Validation and authentication error handling. Websocket functionality provided by socket.io.
+This app was built with the intention of showcasing websocket functionality. App features a react client side supported by a node.js RESTful API backend with data stored on a MongoDB cluster. Features include user signup and login. Validation and authentication error handling. Websocket functionality provided by socket.io. [Walkthrough Demo](https://youtu.be/_9rfRxqCnok).
 
 [Signup Login Feature Demo](https://youtu.be/CcWYHxC6Ycc).
 
