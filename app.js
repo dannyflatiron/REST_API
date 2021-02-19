@@ -5,8 +5,7 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 const multer = require('multer')
 
-const feedRoutes = require('./routes/feed')
-const authRoutes = require('./routes/auth')
+
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -46,8 +45,7 @@ app.use((request, response, next) => {
   next()
 })
 
-app.use('/feed', feedRoutes)
-app.use('/auth', authRoutes)
+
 
 app.use((error, request, response, next) => {
   console.log(error)
@@ -61,10 +59,6 @@ mongoose.connect(
   `mongodb+srv://dannyreina:${process.env.PASSWORD}@cluster0.vnxsz.mongodb.net/network?retryWrites=true&w=majority`,
   { useNewUrlParser: true, useUnifiedTopology: true })
   .then(result => {
-    const server = app.listen(8080);
-    const io = require('./socket').init(server);
-    io.on('connection', socket => {
-      console.log('Client connected');
-    });
+    app.listen(8080);
   })
   .catch(err => console.log(err))
