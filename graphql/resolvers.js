@@ -54,7 +54,7 @@ module.exports = {
     const token = swt.sign({
       userId: user._id.toString(),
       email: user.email
-    }, 'somesupersecretsecret', { expiresIn: '1hr' })
+    }, `${process.env.JWT}`, { expiresIn: '1hr' })
     return { token: token, userId: user._id.toString() }
   },
 
