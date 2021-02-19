@@ -43,8 +43,12 @@ app.use('/images', express.static(path.join(__dirname, 'images')))
 // resolve CORS problem
 app.use((request, response, next) => {
   response.setHeader('Access-Control-Allow-Origin', '*')
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE')
+  response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PATCH, PUT, DELETE')
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  // HANDLE ERROR RESPONSE FOR PREFLGITH DOES NOT HAVE HTTP OK STATUS
+  if (request.method === 'OPTIONS') {
+    return response.sendStatus(200)
+  }
   next()
 })
 
