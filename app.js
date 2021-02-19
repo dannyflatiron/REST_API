@@ -8,7 +8,7 @@ const { graphqlHTTP } = require('express-graphql');
 
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
-const auth = require('./middleware/auth.js')
+const auth = require('./middleware/auth')
 
 
 const fileStorage = multer.diskStorage({
@@ -53,7 +53,7 @@ app.use((request, response, next) => {
   next()
 })
 
-app.use(auth)
+app.use(auth);
 
 app.use(
   '/graphql',
@@ -63,23 +63,22 @@ app.use(
     graphiql: true,
     formatError(err) {
       if (!err.originalError) {
-        return err
+        return err;
       }
-      const data = err.originalError.data
-      const message = err.message || 'An error occured'
-      const code = err.originalError.code || 500
-      return { message: message, status: code, data: data } 
+      const data = err.originalError.data;
+      const message = err.message || 'An error occurred.';
+      const code = err.originalError.code || 500;
+      return { message: message, status: code, data: data };
     }
   })
 );
 
-app.use((error, request, response, next) => {
-  console.log(error)
-  const status = error.statusCode || 500
-  const message = error.message
-  const data = error.data
-  response.status(status).json({ message: message, data: data })
-})
+app.use((error, req, res, next) => {
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
+});
 
 mongoose.connect(
   `mongodb+srv://dannyreina:${process.env.PASSWORD}@cluster0.vnxsz.mongodb.net/network?retryWrites=true&w=majority`,
